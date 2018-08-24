@@ -112,7 +112,7 @@ contract RenExSettlement is Ownable {
     }
 
     modifier onlySlasher() {
-        require(msg.sender == slasherAddress, "unauthorised");
+        require(msg.sender == slasherAddress, "unauthorized");
         _;
     }
 

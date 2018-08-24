@@ -5,7 +5,7 @@ import { randomBytes } from "crypto";
 chai.use(chaiAsPromised);
 chai.should();
 
-const AtomicInfo = artifacts.require("AtomicInfo");
+const RenExAtomicInfo = artifacts.require("RenExAtomicInfo");
 const RepublicToken = artifacts.require("RepublicToken");
 const DarknodeRegistry = artifacts.require("DarknodeRegistry");
 const Orderbook = artifacts.require("Orderbook");
@@ -20,7 +20,7 @@ const openOrder = async (orderbook, trader) => {
     return orderID;
 }
 
-contract("AtomicInfo", function (accounts: string[]) {
+contract("RenExAtomicInfo", function (accounts: string[]) {
 
     let info, swap, addr, orderbook;
     const darknode = accounts[0];
@@ -43,7 +43,7 @@ contract("AtomicInfo", function (accounts: string[]) {
         await dnr.register(darknode, "0x00", 0, { from: darknode });
         await dnr.epoch();
 
-        info = await AtomicInfo.new(orderbook.address);
+        info = await RenExAtomicInfo.new(orderbook.address);
     });
 
     it("can submit and retrieve swap details", async () => {
@@ -62,33 +62,33 @@ contract("AtomicInfo", function (accounts: string[]) {
         (await info.getOwnerAddress(orderID)).should.equal(addr, { from: trader });
     });
 
-    it("can authorise another address to submit details", async () => {
+    it("can authorize another address to submit details", async () => {
         const orderID = await openOrder(orderbook, trader);
-        await info.authoriseSwapper(box, { from: trader });
+        await info.authorizeSwapper(box, { from: trader });
 
         swap = "0x567890";
         await info.submitDetails(orderID, swap, { from: box });
         (await info.swapDetails(orderID)).should.equal(swap);
     });
 
-    it("can deauthorise another address to submit details", async () => {
+    it("can deauthorize another address to submit details", async () => {
         const orderID = await openOrder(orderbook, trader);
-        await info.authoriseSwapper(box, { from: trader });
-        await info.deauthoriseSwapper(box, { from: trader });
+        await info.authorizeSwapper(box, { from: trader });
+        await info.deauthorizeSwapper(box, { from: trader });
 
         swap = "0x567890";
         await info.submitDetails(orderID, swap, { from: box })
-            .should.be.rejectedWith(null, /not authorised/);
+            .should.be.rejectedWith(null, /not authorized/);
 
         chai.assert(await info.swapDetails(orderID) === null, "expected swap details to be null");
     });
 
-    it("non-authorised address can't submit details", async () => {
+    it("non-authorized address can't submit details", async () => {
         const orderID = await openOrder(orderbook, trader);
 
         swap = "0x567890";
         await info.submitDetails(orderID, swap, { from: attacker })
-            .should.be.rejectedWith(null, /not authorised/);
+            .should.be.rejectedWith(null, /not authorized/);
         chai.assert(await info.swapDetails(orderID) === null, "expected swap details to be null");
     });
 

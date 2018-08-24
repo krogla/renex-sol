@@ -45,7 +45,7 @@ contract RenExBalances is Ownable {
     @notice Throws if called by any account other than the RenExSettlement contract
     */
     modifier onlyRenExSettlementContract() {
-        require(msg.sender == address(settlementContract), "not authorised");
+        require(msg.sender == address(settlementContract), "not authorized");
         _;
     }
 

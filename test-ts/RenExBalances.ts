@@ -174,7 +174,7 @@ contract("RenExBalances", function (accounts) {
             REN.address,
             1,
             { from: accounts[1] }
-        ).should.be.rejectedWith(null, /not authorised/);
+        ).should.be.rejectedWith(null, /not authorized/);
 
         await renExBalances.decrementBalanceWithFee(
             accounts[1],
@@ -183,7 +183,7 @@ contract("RenExBalances", function (accounts) {
             0,
             accounts[1],
             { from: accounts[1] }
-        ).should.be.rejectedWith(null, /not authorised/);
+        ).should.be.rejectedWith(null, /not authorized/);
     });
 
     it("deposits validates the transfer", async () => {
